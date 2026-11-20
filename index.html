@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Иванушка в гостях — КПЦ им. Ефима Честнякова</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; overflow: hidden; font-family: Georgia, 'Times New Roman', serif; background: #1a0f05; user-select: none; }
-  #novel { position: relative; width: 100vw; height: 100vh; overflow: hidden; background: #2a1a0a; }
+  html, body { width: 100%; height: 100%; overflow: hidden; font-family: Georgia, 'Times New Roman', serif; background: #1a0f05; user-select: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  #novel { position: absolute; inset: 0; width: 100%; height: 100vh; height: -webkit-fill-available; height: 100dvh; overflow: hidden; background: #2a1a0a; }
 
   /* Фон — теперь картинка */
   #bg { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; transition: opacity .6s ease; }
@@ -96,13 +96,17 @@
   #progress .dot.done { background: #16a34a; }
 
   @media (max-width: 600px) {
-    #text { font-size: 1rem; }
-    #dialogue { padding: 32px 5% 20px; min-height: 200px; }
-    .sprite img { max-height: 55vh; max-width: 50vw; }
+    #text { font-size: 1rem; min-height: 44px; max-height: 34vh; max-height: 34dvh; -webkit-overflow-scrolling: touch; }
+    #dialogue { padding: 32px 5% calc(20px + env(safe-area-inset-bottom, 0px)); min-height: 180px; }
+    .sprite img { max-height: 55vh; max-height: 55dvh; max-width: 50vw; }
     .sprite .placeholder { width: 130px; height: 240px; font-size: .7rem; }
     #start h1 { font-size: 1.5rem; }
     .choice { font-size: .88rem; padding: 14px 16px; }
+    #musicBtn { top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); }
+    #progress { top: calc(12px + env(safe-area-inset-top, 0px)); }
   }
+  /* Высокие блоки не должны обрезаться на низких экранах (телефон в альбомной ориентации) */
+  #start, #final { overflow-y: auto; }
 </style>
 </head>
 <body>

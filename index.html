@@ -7,14 +7,14 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { width: 100%; height: 100%; overflow: hidden; font-family: Georgia, 'Times New Roman', serif; background: #1a0f05; user-select: none; -webkit-text-size-adjust: 100%; }
-  #novel { position: relative; width: 100vw; height: 100vh; height: -webkit-fill-available; height: 100dvh; overflow: hidden; background: #2a1a0a; }
+  #novel { position: relative; width: 100vw; height: 100vh; height: -webkit-fill-available; height: 100dvh; overflow: hidden; background: #2a1a0a; --dialogue-h: 220px; }
 
   /* Фон — теперь картинка */
   #bg { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; transition: opacity .6s ease; }
   #bg .bg-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-size: 1rem; color: rgba(255,255,255,.5); background: linear-gradient(160deg, #2a1a0a, #7c2d12); }
 
   /* Спрайты */
-  .sprite { position: absolute; bottom: var(--dialogue-h, 220px); z-index: 3; transform: translateY(50%); transition: bottom .5s ease, opacity .4s ease; opacity: 0; pointer-events: none; }
+  .sprite { position: absolute; bottom: var(--dialogue-h, 0px); transform: translateY(50%); z-index: 3; transition: bottom .45s ease, opacity .4s ease; opacity: 0; pointer-events: none; }
   .sprite.active { opacity: 1; }
   .sprite.left { left: 4%; }
   .sprite.right { right: 4%; }
@@ -25,7 +25,7 @@
   #dialogue { position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; background: linear-gradient(180deg, rgba(30,15,5,0) 0%, rgba(30,15,5,.85) 20%, rgba(30,15,5,.95) 100%); padding: 40px 6% calc(24px + env(safe-area-inset-bottom)); min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
   #speaker { display: inline-block; background: #d97706; color: #fff; font-family: system-ui, sans-serif; font-size: .85rem; font-weight: 700; padding: 6px 18px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .03em; box-shadow: 0 2px 8px rgba(0,0,0,.4); align-self: flex-start; opacity: 0; transition: opacity .3s; }
   #speaker.visible { opacity: 1; }
-  #text { color: #fef9e7; font-size: 1.15rem; line-height: 1.65; text-shadow: 0 2px 6px rgba(0,0,0,.8); min-height: 44px; max-height: 34vh; max-height: 34dvh; overflow-y: auto; }
+  #text { color: #fef9e7; font-size: 1.15rem; line-height: 1.65; text-shadow: 0 2px 6px rgba(0,0,0,.8); min-height: 44px; max-height: 34dvh; overflow-y: auto; }
   #text em { color: #fcd34d; font-style: normal; font-weight: 700; }
   #text .thought { color: #93c5fd; font-style: italic; }
   #next-indicator { position: absolute; bottom: 16px; right: 6%; color: #fcd34d; font-size: 1.4rem; animation: bounce 1.2s ease-in-out infinite; opacity: 0; transition: opacity .3s; }
@@ -58,7 +58,7 @@
   .feedback-btn:hover { transform: scale(1.05); }
 
   /* Старт */
-  #start { position: absolute; inset: 0; z-index: 30; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; transition: opacity .6s; overflow-y: auto; }
+  #start { position: absolute; inset: 0; z-index: 30; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; overflow-y: auto; transition: opacity .6s; }
   #start.hidden { opacity: 0; pointer-events: none; }
   #start .apple { font-size: 4rem; margin-bottom: 16px; animation: bounce 2s ease-in-out infinite; }
   #start h1 { color: #fef9e7; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 4px 16px rgba(0,0,0,.5); }
@@ -97,7 +97,7 @@
 
   @media (max-width: 600px) {
     #text { font-size: 1rem; }
-    #dialogue { padding: 32px 5% 20px; min-height: 200px; }
+    #dialogue { padding: 32px 5% calc(20px + env(safe-area-inset-bottom)); min-height: 180px; }
     .sprite img { max-height: 42vh; max-height: 42dvh; max-width: 50vw; }
     .sprite .placeholder { width: 130px; height: 240px; font-size: .7rem; }
     #start h1 { font-size: 1.5rem; }
@@ -142,7 +142,7 @@
       <div class="title">🏺 Приходи и ты!</div>
       <div class="desc">
         КПЦ имени Ефима Честнякова<br>
-        Лепим, поём, играем в театр и читаем сказки<br>
+        Лепим, рисуем, играем в театр и читаем сказки<br>
         <strong>20 ноября — Всемирный день защиты прав ребёнка</strong>
       </div>
     </div>
@@ -171,10 +171,10 @@ const scenes = [
     lines: [
       { speaker: "Рассказчик", text: "В деревеньке, что стоит на берегу тихой речки, жил-был мальчик Иванушка. Домик у него был небольшой, крыша соломенная, а за околицей — луга да перелески. Каждое утро Иванушка просыпался от петушиного крика, помогал по хозяйству: то воды принесёт, то дров наколет, то гусей на луг выгонит. А потом… а потом садился на крылечко и смотрел вдаль." },
       { speaker: "Иванушка", text: "Эх… скучно-то как. Всё одно да одно: печка, да двор, да гуси за околицей. Вон за лесом, говорят, город стоит — Кострома. Там терема, купола, люди разные. А я тут сижу… Хочется чего-то нового узнать, окультуриться, что ли…" },
-      { speaker: "Рассказчик", text: "Вздохнул Иванушка. А солнце уже к полудню клонится, тени длинные стали. И вдруг — откуда ни возьмись — гуси-лебеди. Белые, большие, крылья широкие. Закружились над деревней, замахали крыльями, закричали." },
+      { speaker: "Рассказчик", text: "Вздохнул Иванушка. А солнце уже к полудню клонится, тени длинные стали. И вдруг — откуда ни возьмись — гуси-лебеди. Белые, большие, крылья широкие. Закружились над деревней, замахали крыльями и закричали:" },
       { speaker: "Гуси-лебеди", text: "Иванушка! А Иванушка! Чего сидишь, скучаешь? Садись на нас, прокатим! Покажем тебе Кострому — город дивный! Терема там расписные, купола золочёные, а людей — не счесть!" },
       { speaker: "Иванушка", text: "Вот это да! А вы… а не обманете? Бабушка сказывала, будто вы, гуси-лебеди, к Бабе-Яге уносите, да там и оставляете!" },
-      { speaker: "Гуси-лебеди", text: "Обижаешь, Иванушка! Мы теперь добрые. Не к Бабе-Яге летим — в Кострому, в центр имени Ефима Честнякова. Там учат уму-разуму да ремеслу: лепить, петь, сказки сказывать. Садись, не пожалеешь!" },
+      { speaker: "Гуси-лебеди", text: "Обижаешь, Иванушка! Мы теперь добрые. Не к Бабе-Яге летим — в Кострому, в центр имени Ефима Честнякова. Там учат уму-разуму да ремеслу: лепить, рисовать, сказки сказывать. Садись, не пожалеешь!" },
       { speaker: "Иванушка", text: "Вот бы и правда… А то дома только грамоте учили, а больше ничему. Я ведь и лепить хочу, и сказки сказывать… Только бабушка… Она же волноваться будет. Как же быть-то?", thought: true },
       { speaker: "Рассказчик", text: "Задумался Иванушка. С одной стороны — мечта зовёт, хочется мир посмотреть. А с другой — бабушка дома, волноваться будет. Как же быть?" }
     ],
@@ -193,17 +193,17 @@ const scenes = [
     lines: [
       { speaker: "Рассказчик", text: "Высоко летят гуси-лебеди. Под ними — поля золотые, реки синие, леса зелёные. А вдали уже Кострома показывается: терема, купола, колокольни. Иванушка от восторга и слова вымолвить не может." },
       { speaker: "Иванушка", text: "Вот это да… Никогда такого не видел! Вон река блестит, будто серебро! А вон — терем какой-то, расписной!" },
-      { speaker: "Гуси-лебеди", text: "То не просто терем, Иванушка. То центр имени Ефима Честнякова. Знаменитое место! Там дети лепят глиняные игрушки, поют песни, играют в театре, сказки читают. И всему этому учат — и больших, и маленьких." },
-      { speaker: "Иванушка", text: "Вот бы мне туда… Я ведь тоже хочу научиться — и лепить, и читать, и сказки сказывать. Дома-то меня только грамоте учили, а больше ничему…" },
+      { speaker: "Гуси-лебеди", text: "То не просто терем, Иванушка. То центр имени Ефима Честнякова. Знаменитое место! Там дети лепят глиняные игрушки, рисуют, играют в театре, сказки читают. И всему этому учат — и больших, и маленьких." },
+      { speaker: "Иванушка", text: "Вот бы мне туда… Я ведь тоже хочу научиться — и лепить, и рисовать, и сказки сказывать. Дома-то меня только грамоте учили, а больше ничему…" },
       { speaker: "Гуси-лебеди", text: "Так чего же ты хочешь, Иванушка? Чему бы ты хотел там научиться?" },
-      { speaker: "Иванушка", text: "Чему хочу… Да всему! И глину в руках держать, и сказки читать, и песни петь. Только… а вдруг не примут? Вдруг скажут — мал ещё?", thought: true },
+      { speaker: "Иванушка", text: "Чему хочу… Да всему! И глину в руках держать, и рисовать, и сказки читать. Только… а вдруг не примут? Вдруг скажут — мал ещё?", thought: true },
       { speaker: "Рассказчик", text: "А гуси-лебеди кружат, ждут ответа. И терем всё ближе, ближе…" }
     ],
     question: {
       text: "Что ответит Иванушка?",
       choices: [
         { text: "Только играть да баловаться", correct: false, feedback: "Играть — хорошо, но право на образование (ст. 28) — тоже твоё право. Подумай ещё.", article: "ст. 28" },
-        { text: "Учиться читать, лепить и сказки сказывать", correct: true, feedback: "Верно! Право на образование (ст. 28) и право на творчество (ст. 31) живут вместе. Гуси одобрительно закивали.", article: "ст. 28, 31" },
+        { text: "Учиться лепить, рисовать и сказки сказывать", correct: true, feedback: "Верно! Право на образование (ст. 28) и право на творчество (ст. 31) живут вместе. Гуси одобрительно закивали.", article: "ст. 28, 31" },
         { text: "Ничего не хочу, просто посмотреть", correct: false, feedback: "Но ты же сам захотел окультуриться! Право на образование — это твой выбор. Попробуй снова.", article: "ст. 28" }
       ]
     }
@@ -212,7 +212,7 @@ const scenes = [
     bg: "gate",
     sprites: { ivan: "left", geese: null, efim: "right" },
     lines: [
-      { speaker: "Рассказчик", text: "Опустились гуси-лебеди у крыльца. Иванушка глазам не верит: вокруг дети играют, кто-то лепит, кто-то поёт. А на крыльце стоит старик — седой, с добрыми глазами, в простой рубахе, а в руке у него глиняная свистулька. Это сам Ефим Васильевич Честняков, художник и сказочник, чьё имя носит центр." },
+      { speaker: "Рассказчик", text: "Опустились гуси-лебеди у крыльца. Иванушка глазам не верит: вокруг дети играют, кто-то лепит, кто-то рисует. А на крыльце стоит старик — седой, с добрыми глазами, в простой рубахе, а в руке у него глиняная свистулька. Это сам Ефим Васильевич Честняков, художник и сказочник, чьё имя носит центр." },
       { speaker: "Ефим Честняков", text: "Здравствуй, Иванушка! Знаю, зачем прилетел. Гуси-лебеди мне уже рассказали. Учиться уму-разуму да ремеслу — дело доброе! Только сначала скажи: знаешь ли ты, что каждый ребёнок имеет право учиться?" },
       { speaker: "Иванушка", text: "Знаю, дедушка Ефим… А ещё знаю, что меня здесь не обидят. Ведь каждый ребёнок имеет право на защиту." },
       { speaker: "Ефим Честняков", text: "Верно говоришь! А теперь ответь мне вот на что: как думаешь, что для ребёнка всего важнее, когда он в новый дом приходит?" },
@@ -235,7 +235,7 @@ const scenes = [
       { speaker: "Рассказчик", text: "Открыл Ефим Васильевич дверь, и вошли они внутрь. А там — мастерская: столы длинные, на полках глиняные человечки, свистульки, птицы. Пахнет глиной и деревом." },
       { speaker: "Рассказчик", text: "Посадил Ефим Васильевич Иванушку за стол, дал ему кусок глины. Мягкая, прохладная — так и просится в руки." },
       { speaker: "Ефим Честняков", text: "Возьми глину, Иванушка. Слепи свою мечту. Но сначала скажи: что главное для ребёнка, который пришёл учиться?" },
-      { speaker: "Иванушка", text: "Хм… Главное, чтобы его слышали. Ведь каждый ребёнок имеет право на своё мнение. И чтобы защищали. И чтобы учиться давал…" },
+      { speaker: "Иванушка", text: "Хм… Главное, чтобы его слышали. Ведь каждый ребёнок имеет право на своё мнение. И чтобы защищали. И чтобы дали учиться…" },
       { speaker: "Ефим Честняков", text: "Молодец! А теперь — лепи. Покажи, о чём мечтаешь." },
       { speaker: "Рассказчик", text: "Долго ли, коротко ли — начал Иванушка лепить. Сначала комочек, потом другой. И стало выходить у него… яблоко. Да не простое — с человечком внутри." },
       { speaker: "Иванушка", text: "Вот ведь… Само выходит. Будто яблоко это — про меня. Внутри — человечек, маленький, а вокруг — мир большой. И яблоко его хранит, будто центр наш…", thought: true },
@@ -254,7 +254,7 @@ const scenes = [
     bg: "final",
     sprites: { ivan: "left", geese: null, efim: "right" },
     lines: [
-      { speaker: "Рассказчик", text: "Посмотрел Ефим Васильевич на яблоко, погладил бороду и говорит…" },
+      { speaker: "Рассказчик", text: "Посмотрел Ефим Васильевич на яблоко, погладил бороду и говорит:" },
       { speaker: "Ефим Честняков", text: "Славное яблоко, Иванушка! Как яблоко хранит семечко, так и наш центр хранит права каждого ребёнка. Запомни: ты имеешь право учиться, творить, быть услышанным и защищённым. И приходи к нам ещё — тебе здесь всегда рады!" },
       { speaker: "Иванушка", text: "Спасибо, дедушка Ефим! Теперь я знаю свои права — и буду учиться! И другим расскажу!" },
       { speaker: "Гуси-лебеди", text: "Молодец, Иванушка! А мы тебя домой проводим. Только сначала — ответь нам на последний вопрос!" },
@@ -292,24 +292,6 @@ const spriteIvan = document.getElementById('sprite-ivan');
 const spriteGeese = document.getElementById('sprite-geese');
 const spriteEfim = document.getElementById('sprite-efim');
 
-/* Привязка спрайтов к линии градиента (верх диалога) */
-let lastDialogueH = 220;
-function updateSpriteAnchor() {
-  const isHidden = getComputedStyle(dialogueEl).display === 'none';
-  if (isHidden) {
-    /* диалог скрыт (экран выбора) — спрайты остаются на последней высоте */
-    document.documentElement.style.setProperty('--dialogue-h', lastDialogueH + 'px');
-    return;
-  }
-  const h = dialogueEl.getBoundingClientRect().height;
-  if (h > 0) {
-    lastDialogueH = h;
-    document.documentElement.style.setProperty('--dialogue-h', h + 'px');
-  }
-}
-new ResizeObserver(updateSpriteAnchor).observe(dialogueEl);
-updateSpriteAnchor();
-
 /* Фон — картинка с fallback-плейсхолдером */
 function setBackground(name) {
   const src = backgrounds[name];
@@ -328,6 +310,20 @@ function setBackground(name) {
   };
   img.src = src;
 }
+
+/* Связь: высота диалога → кромка градиента → позиция спрайтов */
+const novelRoot = document.getElementById('novel');
+function updateDialogueH() {
+  const h = dialogueEl.offsetHeight;
+  if (h > 0) novelRoot.style.setProperty('--dialogue-h', h + 'px');
+}
+if (window.ResizeObserver) {
+  new ResizeObserver(updateDialogueH).observe(dialogueEl);
+} else {
+  window.addEventListener('resize', updateDialogueH);
+  window.addEventListener('orientationchange', () => setTimeout(updateDialogueH, 200));
+}
+updateDialogueH();
 
 /* Спрайты */
 function setSprites(sprites) {

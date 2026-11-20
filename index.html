@@ -6,26 +6,28 @@
 <title>Иванушка в гостях — КПЦ им. Ефима Честнякова</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { width: 100%; height: 100%; overflow: hidden; font-family: Georgia, 'Times New Roman', serif; background: #1a0f05; user-select: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-  #novel { position: absolute; inset: 0; width: 100%; height: 100vh; height: -webkit-fill-available; height: 100dvh; overflow: hidden; background: #2a1a0a; }
+  html, body { width: 100%; height: 100%; overflow: hidden; font-family: Georgia, 'Times New Roman', serif; background: #1a0f05; user-select: none; }
+  #novel { position: relative; width: 100vw; height: 100vh; height: -webkit-fill-available; height: 100dvh; overflow: hidden; background: #2a1a0a; }
 
   /* Фон — теперь картинка */
   #bg { position: absolute; inset: 0; z-index: 1; background-size: cover; background-position: center; transition: opacity .6s ease; }
   #bg .bg-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-size: 1rem; color: rgba(255,255,255,.5); background: linear-gradient(160deg, #2a1a0a, #7c2d12); }
 
   /* Спрайты */
-  .sprite { position: absolute; bottom: 0; z-index: 3; transition: transform .5s ease, opacity .4s ease; opacity: 0; pointer-events: none; }
+  /* Спрайты «стоят» на верхней кромке градиента диалога — их положение
+     задаётся переменной --dialogue-h, которую обновляет ResizeObserver */
+  .sprite { position: absolute; bottom: calc(var(--dialogue-h, 0px) - 10px); z-index: 3; transition: transform .5s ease, opacity .4s ease, bottom .35s ease; opacity: 0; pointer-events: none; }
   .sprite.active { opacity: 1; }
   .sprite.left { left: 4%; }
   .sprite.right { right: 4%; }
-  .sprite img { max-height: 70vh; max-width: 40vw; display: block; filter: drop-shadow(0 8px 24px rgba(0,0,0,.4)); }
+  .sprite img { max-height: min(58vh, 62dvh); max-width: 40vw; display: block; filter: drop-shadow(0 8px 24px rgba(0,0,0,.4)); }
   .sprite .placeholder { width: 180px; height: 340px; background: linear-gradient(180deg, #c2410c, #7c2d12); border-radius: 90px 90px 20px 20px; display: flex; align-items: center; justify-content: center; color: #fff; font-family: system-ui, sans-serif; font-size: .8rem; font-weight: 700; text-align: center; padding: 20px; box-shadow: inset 0 -20px 40px rgba(0,0,0,.3); border: 3px solid #fef3c7; }
 
   /* Диалог */
-  #dialogue { position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; background: linear-gradient(180deg, rgba(30,15,5,0) 0%, rgba(30,15,5,.85) 20%, rgba(30,15,5,.95) 100%); padding: 40px 6% 24px; min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
+  #dialogue { position: absolute; bottom: 0; left: 0; right: 0; z-index: 10; background: linear-gradient(180deg, rgba(30,15,5,0) 0%, rgba(30,15,5,.85) 20%, rgba(30,15,5,.95) 100%); padding: 40px 6% calc(24px + env(safe-area-inset-bottom)); min-height: 220px; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
   #speaker { display: inline-block; background: #d97706; color: #fff; font-family: system-ui, sans-serif; font-size: .85rem; font-weight: 700; padding: 6px 18px; border-radius: 999px; margin-bottom: 12px; letter-spacing: .03em; box-shadow: 0 2px 8px rgba(0,0,0,.4); align-self: flex-start; opacity: 0; transition: opacity .3s; }
   #speaker.visible { opacity: 1; }
-  #text { color: #fef9e7; font-size: 1.15rem; line-height: 1.65; text-shadow: 0 2px 6px rgba(0,0,0,.8); min-height: 60px; max-height: 40vh; overflow-y: auto; }
+  #text { color: #fef9e7; font-size: 1.15rem; line-height: 1.65; text-shadow: 0 2px 6px rgba(0,0,0,.8); min-height: 44px; max-height: 34vh; max-height: 34dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   #text em { color: #fcd34d; font-style: normal; font-weight: 700; }
   #text .thought { color: #93c5fd; font-style: italic; }
   #next-indicator { position: absolute; bottom: 16px; right: 6%; color: #fcd34d; font-size: 1.4rem; animation: bounce 1.2s ease-in-out infinite; opacity: 0; transition: opacity .3s; }
@@ -58,7 +60,7 @@
   .feedback-btn:hover { transform: scale(1.05); }
 
   /* Старт */
-  #start { position: absolute; inset: 0; z-index: 30; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; transition: opacity .6s; }
+  #start { position: absolute; inset: 0; z-index: 30; overflow-y: auto; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; transition: opacity .6s; }
   #start.hidden { opacity: 0; pointer-events: none; }
   #start .apple { font-size: 4rem; margin-bottom: 16px; animation: bounce 2s ease-in-out infinite; }
   #start h1 { color: #fef9e7; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 4px 16px rgba(0,0,0,.5); }
@@ -69,7 +71,7 @@
   #start .brand { margin-top: 32px; color: #b45309; font-family: system-ui, sans-serif; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
 
   /* Финал */
-  #final { position: absolute; inset: 0; z-index: 35; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+  #final { position: absolute; inset: 0; z-index: 35; overflow-y: auto; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
   #final.visible { display: flex; }
   #final .apple { font-size: 3.5rem; margin-bottom: 16px; animation: bounce 2s ease-in-out infinite; }
   #final h2 { color: #fef9e7; font-size: 1.6rem; margin-bottom: 16px; }
@@ -85,28 +87,24 @@
   .final-btn:hover { transform: scale(1.05); }
 
   /* Музыка */
-  #musicBtn { position: absolute; top: 16px; right: 16px; z-index: 40; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #d97706; background: rgba(30,15,5,.7); color: #fcd34d; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
+  #musicBtn { position: absolute; top: calc(16px + env(safe-area-inset-top)); right: calc(16px + env(safe-area-inset-right)); z-index: 40; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #d97706; background: rgba(30,15,5,.7); color: #fcd34d; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; }
   #musicBtn:hover { background: #d97706; color: #fff; }
   #musicBtn.playing { background: #d97706; color: #fff; }
 
   /* Прогресс */
-  #progress { position: absolute; top: 16px; left: 16px; z-index: 40; display: flex; gap: 6px; }
+  #progress { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: calc(16px + env(safe-area-inset-left)); z-index: 40; display: flex; gap: 6px; }
   #progress .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(252,211,77,.3); transition: all .3s; }
   #progress .dot.active { background: #fcd34d; transform: scale(1.3); }
   #progress .dot.done { background: #16a34a; }
 
   @media (max-width: 600px) {
-    #text { font-size: 1rem; min-height: 44px; max-height: 34vh; max-height: 34dvh; -webkit-overflow-scrolling: touch; }
-    #dialogue { padding: 32px 5% calc(20px + env(safe-area-inset-bottom, 0px)); min-height: 180px; }
-    .sprite img { max-height: 55vh; max-height: 55dvh; max-width: 50vw; }
+    #text { font-size: 1rem; }
+    #dialogue { padding: 32px 5% 20px; min-height: 200px; }
+    .sprite img { max-height: 42vh; max-height: 42dvh; max-width: 50vw; }
     .sprite .placeholder { width: 130px; height: 240px; font-size: .7rem; }
     #start h1 { font-size: 1.5rem; }
     .choice { font-size: .88rem; padding: 14px 16px; }
-    #musicBtn { top: calc(12px + env(safe-area-inset-top, 0px)); right: calc(12px + env(safe-area-inset-right, 0px)); }
-    #progress { top: calc(12px + env(safe-area-inset-top, 0px)); }
   }
-  /* Высокие блоки не должны обрезаться на низких экранах (телефон в альбомной ориентации) */
-  #start, #final { overflow-y: auto; }
 </style>
 </head>
 <body>
@@ -296,6 +294,19 @@ const progressEl = document.getElementById('progress');
 const spriteIvan = document.getElementById('sprite-ivan');
 const spriteGeese = document.getElementById('sprite-geese');
 const spriteEfim = document.getElementById('sprite-efim');
+
+/* Привязка спрайтов к градиенту: следим за высотой блока диалога.
+   Пока открыт экран выбора/фидбека, высоту «запоминаем», чтобы
+   персонажи не прыгали вниз. */
+let dialogueH = 0;
+const dialogueResize = new ResizeObserver(() => {
+  const h = dialogueEl.offsetHeight;
+  if (h > 0) {
+    dialogueH = h;
+    document.documentElement.style.setProperty('--dialogue-h', dialogueH + 'px');
+  }
+});
+dialogueResize.observe(dialogueEl);
 
 /* Фон — картинка с fallback-плейсхолдером */
 function setBackground(name) {

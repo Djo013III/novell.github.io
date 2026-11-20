@@ -14,11 +14,11 @@
   #bg .bg-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-size: 1rem; color: rgba(255,255,255,.5); background: linear-gradient(160deg, #2a1a0a, #7c2d12); }
 
   /* Спрайты */
-  .sprite { position: absolute; bottom: var(--dialogue-h, 220px); z-index: 3; transform: translateY(50%); transition: bottom .45s ease, opacity .4s ease; opacity: 0; pointer-events: none; }
+  .sprite { position: absolute; bottom: var(--dialogue-h, 220px); z-index: 3; transform: translateY(50%); transition: bottom .5s ease, opacity .4s ease; opacity: 0; pointer-events: none; }
   .sprite.active { opacity: 1; }
   .sprite.left { left: 4%; }
   .sprite.right { right: 4%; }
-  .sprite img { max-height: 58vh; max-height: 58dvh; max-width: 40vw; display: block; filter: drop-shadow(0 8px 24px rgba(0,0,0,.4)); }
+  .sprite img { max-height: 58vh; max-width: 40vw; display: block; filter: drop-shadow(0 8px 24px rgba(0,0,0,.4)); }
   .sprite .placeholder { width: 180px; height: 340px; background: linear-gradient(180deg, #c2410c, #7c2d12); border-radius: 90px 90px 20px 20px; display: flex; align-items: center; justify-content: center; color: #fff; font-family: system-ui, sans-serif; font-size: .8rem; font-weight: 700; text-align: center; padding: 20px; box-shadow: inset 0 -20px 40px rgba(0,0,0,.3); border: 3px solid #fef3c7; }
 
   /* Диалог */
@@ -58,7 +58,7 @@
   .feedback-btn:hover { transform: scale(1.05); }
 
   /* Старт */
-  #start { position: absolute; inset: 0; z-index: 30; overflow-y: auto; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; transition: opacity .6s; }
+  #start { position: absolute; inset: 0; z-index: 30; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; transition: opacity .6s; overflow-y: auto; }
   #start.hidden { opacity: 0; pointer-events: none; }
   #start .apple { font-size: 4rem; margin-bottom: 16px; animation: bounce 2s ease-in-out infinite; }
   #start h1 { color: #fef9e7; font-size: 2rem; margin-bottom: 8px; text-shadow: 0 4px 16px rgba(0,0,0,.5); }
@@ -69,7 +69,7 @@
   #start .brand { margin-top: 32px; color: #b45309; font-family: system-ui, sans-serif; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; }
 
   /* Финал */
-  #final { position: absolute; inset: 0; z-index: 35; overflow-y: auto; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+  #final { position: absolute; inset: 0; z-index: 35; background: linear-gradient(160deg, #2a1a0a, #7c2d12); display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; overflow-y: auto; }
   #final.visible { display: flex; }
   #final .apple { font-size: 3.5rem; margin-bottom: 16px; animation: bounce 2s ease-in-out infinite; }
   #final h2 { color: #fef9e7; font-size: 1.6rem; margin-bottom: 16px; }
@@ -97,7 +97,7 @@
 
   @media (max-width: 600px) {
     #text { font-size: 1rem; }
-    #dialogue { padding: 32px 5% calc(20px + env(safe-area-inset-bottom)); min-height: 200px; }
+    #dialogue { padding: 32px 5% 20px; min-height: 200px; }
     .sprite img { max-height: 42vh; max-height: 42dvh; max-width: 50vw; }
     .sprite .placeholder { width: 130px; height: 240px; font-size: .7rem; }
     #start h1 { font-size: 1.5rem; }
@@ -148,7 +148,6 @@
     </div>
     <div class="final-actions">
       <button class="final-btn secondary" id="restartBtn">↻ Пройти заново</button>
-
     </div>
   </div>
 </div>
@@ -293,18 +292,23 @@ const spriteIvan = document.getElementById('sprite-ivan');
 const spriteGeese = document.getElementById('sprite-geese');
 const spriteEfim = document.getElementById('sprite-efim');
 
-/* Спрайты привязаны к линии градиента диалога:
-   их середина стоит на верхней кромке панели с текстом */
-const novelEl = document.getElementById('novel');
-let lastDialogueH = 0;
-function syncDialogueHeight() {
-  const h = dialogueEl.offsetHeight;
-  if (h > 0) lastDialogueH = h;
-  novelEl.style.setProperty('--dialogue-h', (lastDialogueH || 220) + 'px');
+/* Привязка спрайтов к линии градиента (верх диалога) */
+let lastDialogueH = 220;
+function updateSpriteAnchor() {
+  const isHidden = getComputedStyle(dialogueEl).display === 'none';
+  if (isHidden) {
+    /* диалог скрыт (экран выбора) — спрайты остаются на последней высоте */
+    document.documentElement.style.setProperty('--dialogue-h', lastDialogueH + 'px');
+    return;
+  }
+  const h = dialogueEl.getBoundingClientRect().height;
+  if (h > 0) {
+    lastDialogueH = h;
+    document.documentElement.style.setProperty('--dialogue-h', h + 'px');
+  }
 }
-new ResizeObserver(syncDialogueHeight).observe(dialogueEl);
-window.addEventListener('resize', syncDialogueHeight);
-syncDialogueHeight();
+new ResizeObserver(updateSpriteAnchor).observe(dialogueEl);
+updateSpriteAnchor();
 
 /* Фон — картинка с fallback-плейсхолдером */
 function setBackground(name) {
@@ -487,11 +491,6 @@ document.getElementById('restartBtn').onclick = () => {
   document.getElementById('final').classList.remove('visible');
   sceneIndex = 0;
   startScene();
-};
-
-
-    });
-  }
 };
 
 /* ============ МУЗЫКА — ПЕРЕПИСАНО НА НАДЁЖНЫЙ ПЛАНИРОВЩИК ============ */
